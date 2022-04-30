@@ -1,9 +1,13 @@
 ;;; package -- wtf  -*- lexical-binding: t; -*-
 ;;; Commentary:
+
+;; Sources:
+;; [1] - https://github.com/MatthewZMD/.emacs.d
+;; [2] - http://emacs-fu.blogspot.com/2010/02/dealing-with-many-buffers-ibuffer.html
+;; [3] - http://xahlee.info/
 ;;; Code:
 
-;;; Sources:
-;; [1] - https://github.com/MatthewZMD/.emacs.d
+
 
 ;; [1]
 ;; Ikke utfør pakke-håndtering
@@ -53,7 +57,9 @@
 ;; [1]
 (unless (bound-and-true-p package--initialized)
   (setq package-enable-at-startup nil)          ; To prevent initializing twice
-  (package-initialize))
+  ;;(package-initialize)                        ; @NOTE - VELDIG USIKKER PÅ DETTE
+  )
+
 ;; set use-package-verbose to t for interpreted .emacs,
 ;; and to nil for byte-compiled .emacs.elc.
 (eval-and-compile
@@ -105,6 +111,33 @@
     :commands (ibuffer-vc-set-filter-groups-by-vc-root)
     :custom
     (ibuffer-vc-skip-if-remote 'nil))
+
+  ;; [2] Sett opp regler for
+  (setq ibuffer-saved-filter-groups
+        (quote (("default"
+                 ("Org" ;; all org-related buffers
+                  (mode . org-mode))
+                 ("vipir 1"
+                  (filename . "prosjekt/favn/vipir/1/"))
+                 ("vipir 2"
+                  (filename . "prosjekt/favn/vipir/2/"))
+                 ("Programming" ;; prog stuff not already in MyProjectX
+                  (or
+                   (mode . c-mode)
+                   (mode . dart-mode)
+                   (mode . python-mode)
+                   (mode . emacs-lisp-mode)
+                   (mode . go-mode)
+                   (mode . typescript-mode)
+                   (mode . haskell-mode)
+                   ;; etc
+                   ))
+                 ))))
+  
+  ;; Organiser vipir-prosjekter i egne grupper
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-switch-to-saved-filter-groups "default")))
   :custom
   (ibuffer-formats
    '((mark modified read-only locked " "
@@ -116,8 +149,10 @@
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename))))
-    
+           " " filename)))
+
+  )
+
 ;; (package-refresh-contents)
 (setq backup-by-copying t      ; don't clobber symlinks
       backup-directory-alist '(("." . "~/.config/emacs/emacs-saves/"))    ; don't litter my fs tree
@@ -152,11 +187,13 @@
  '(font-lock-constant-face ((t (:foreground "#c9b99f"))))
  '(font-lock-doc-string-face ((t (:foreground "#28d43c"))))
  '(font-lock-function-name-face ((t (:foreground "#c9b99f" :weight normal))))
- '(font-lock-keyword-face ((t (:foreground "#f7d7d5" :weight bold))))
+ '(font-lock-keyword-face ((t (:foreground "#f7d7d5" :weight normal))))
  '(font-lock-string-face ((t (:foreground "#fc7923"))))
  '(font-lock-type-face ((t (:foreground "#a7f9be"))))
  '(font-lock-variable-name-face ((t (:foreground "#c9b99f")))))
 
+;; (set-frame-font "PxPlus IBM VGA8 12" nil t)
+(set-frame-font "Meslo LG S 10" nil t)
 
 ;;; Generelle greier
 (global-flycheck-mode)
@@ -165,34 +202,6 @@
           `((".*" . ,temporary-file-directory)))
     (setq auto-save-file-name-transforms
           `((".*" ,temporary-file-directory t)))
-
-
-;;; Bruk IBuffer for å organisere buffre
-;;(global-set-key (kbd "C-x C-b") 'ibuffer)
-;;(setq ibuffer-saved-filter-groups
-  ;; (quote (("default"      
-  ;;           ("Org" ;; all org-related buffers
-  ;;             (mode . org-mode))  
-  ;;           ("vipir 1"
-  ;;             (filename . "prosjekt/favn/vipir/1/"))
-  ;;           ("vipir 2"
-  ;;             (filename . "prosjekt/favn/vipir/2/"))
-  ;;           ("Programming" ;; prog stuff not already in MyProjectX
-  ;;             (or
-  ;;               (mode . c-mode)
-;;                 (mode . dart-mode)
-;;                 (mode . python-mode)
-;;                 (mode . emacs-lisp-mode)
-;;                 (mode . go-mode)
-;;                 (mode . typescript-mode)
-;;                 (mode . haskell-mode)
-;;                 ;; etc
-;;                 )) 
-;;             ))))
-
-;; (add-hook 'ibuffer-mode-hook
-;;   (lambda ()
-;;     (ibuffer-switch-to-saved-filter-groups "default")))
 
 
 ;;; Typescript
