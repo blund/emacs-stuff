@@ -78,9 +78,11 @@
   (require 'use-package)
   (require 'bind-key))
 
-;; [1]
-;; Håndter pakke-oppdateringer hver uke, ikke hver dag..
+
+
 (use-package auto-package-update
+  ;; [1]
+  ;; Håndter pakke-oppdateringer hver uke, ikke hver dag..
   :if (not (daemonp))
   :custom
   (auto-package-update-interval 7) ;; in days
@@ -91,15 +93,16 @@
   (auto-package-update-maybe))
 
 ;; [1]
-;; Truncate lines
+;; Skru av eller på linjebryting.
 (global-set-key (kbd "C-x C-l") #'toggle-truncate-lines)
-;; Adjust font size like web browsers
+;; Endre tekststørrelse.
 (global-set-key (kbd "C-=") #'text-scale-increase)
 (global-set-key (kbd "C-+") #'text-scale-increase)
 (global-set-key (kbd "C--") #'text-scale-decrease)
-;; Move up/down paragraph
+;; Fornuftig hurtigtast for bevegelse opp/ned et paragraf.
 (global-set-key (kbd "M-n") #'forward-paragraph)
 (global-set-key (kbd "M-p") #'backward-paragraph)
+
 
 (use-package highlight-numbers
   :ensure t
@@ -108,12 +111,14 @@
   )
 
 (use-package rainbow-mode
+  ;; For å vise fargen til hex strenger.
   :ensure t
   :init
   (add-hook 'prog-mode-hook 'rainbow-mode)
   )
 
 (use-package ibuffer
+  ;; [1] Erstatning av vanlige buffere, som lar deg sortere buffere.
   :ensure t
   :bind ("C-x C-b" . ibuffer)
   :init
@@ -122,16 +127,21 @@
     :custom
     (ibuffer-vc-skip-if-remote 'nil))
 
-  ;; [2] Sett opp regler for
+  ;; Gjem grupper hvis de er tomme.
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  ;; [2] Sett opp regler for diverse grupper
   (setq ibuffer-saved-filter-groups
         (quote (("default"
-                 ("Org" ;; all org-related buffers
+                 ("Org"
                   (mode . org-mode))
-                 ("vipir 1"
+                 ("Emacs" ;; Emacs konfigurering
+                  (filename . ".config/emacs/"))
+                 ("Vipir 1"
                   (filename . "prosjekt/favn/vipir/1/"))
-                 ("vipir 2"
+                 ("Vipir 2"
                   (filename . "prosjekt/favn/vipir/2/"))
-                 ("Programming" ;; prog stuff not already in MyProjectX
+                 ("Programming" ;; For div programmering som ikke faller under andre kategorier
                   (or
                    (mode . c-mode)
                    (mode . dart-mode)
@@ -144,7 +154,7 @@
                    ))
                  ))))
   
-  ;; Organiser vipir-prosjekter i egne grupper
+  ;; Legg til hooken som aktiverer filtrene
   (add-hook 'ibuffer-mode-hook
             (lambda ()
               (ibuffer-switch-to-saved-filter-groups "default")))
