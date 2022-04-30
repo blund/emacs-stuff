@@ -4,10 +4,9 @@
 ;; Sources:
 ;; [1] - https://github.com/MatthewZMD/.emacs.d
 ;; [2] - http://emacs-fu.blogspot.com/2010/02/dealing-with-many-buffers-ibuffer.html
-;; [3] - http://xahlee.info/
+;; se på -> [3] - http://xahlee.info/
+;; se på -> [4] - https://stackoverflow.com/questions/53697743/use-package-with-config-function-might-not-be-available-at-runtime
 ;;; Code:
-
-
 
 ;; [1]
 ;; Ikke utfør pakke-håndtering
@@ -102,9 +101,20 @@
 (global-set-key (kbd "M-n") #'forward-paragraph)
 (global-set-key (kbd "M-p") #'backward-paragraph)
 
-    
+(use-package highlight-numbers
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+  )
+
+(use-package rainbow-mode
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-mode)
+  )
+
 (use-package ibuffer
-  :ensure nil
+  :ensure t
   :bind ("C-x C-b" . ibuffer)
   :init
   (use-package ibuffer-vc
@@ -163,40 +173,26 @@
 (setq auto-save-file-name-transforms
       `((".*" "~/.config/emacs/emacs-saves/" t)))
 
-
+(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
  '(create-lockfiles nil)
- '(custom-enabled-themes '(misterioso))
+ '(custom-enabled-themes '(naysayer))
+ '(custom-safe-themes
+   '("1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
  '(package-selected-packages
-   '(auto-package-update use-package prettier evil eglot typescript-mode xclip gradle-mode dart-server magit go-mode undo-tree ##)))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#172021" :foreground "#c9b99f" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :width normal :family "Inconsolata"))))
- '(font-lock-builtin-face ((t :foreground "#c9b99f")))
- '(font-lock-comment-face ((t (:foreground "#28d43c"))))
- '(font-lock-constant-face ((t (:foreground "#c9b99f"))))
- '(font-lock-doc-string-face ((t (:foreground "#28d43c"))))
- '(font-lock-function-name-face ((t (:foreground "#c9b99f" :weight normal))))
- '(font-lock-keyword-face ((t (:foreground "#f7d7d5" :weight normal))))
- '(font-lock-string-face ((t (:foreground "#fc7923"))))
- '(font-lock-type-face ((t (:foreground "#a7f9be"))))
- '(font-lock-variable-name-face ((t (:foreground "#c9b99f")))))
+   '(rainbow-mode highlight-numbers auto-package-update use-package prettier evil eglot typescript-mode xclip gradle-mode dart-server magit go-mode undo-tree ##)))
 
 ;; (set-frame-font "PxPlus IBM VGA8 12" nil t)
 (set-frame-font "Meslo LG S 10" nil t)
 
 ;;; Generelle greier
 (global-flycheck-mode)
+(global-hl-line-mode)
+;; (global-highlight-numbers-mode)
 
 (setq backup-directory-alist
           `((".*" . ,temporary-file-directory)))
@@ -209,6 +205,7 @@
 
 ;; ;;; Go
 (defun go-fmt-hook ()
+  "Hook for running gofmt on save."
   (add-hook 'before-save-hook
     (lambda ()
     (progn (gofmt) nil))
@@ -248,10 +245,10 @@ https://github.com/dart-lang/sdk/tree/master/pkg/analyzer_cli#dartanalyzer"
 
 
 (defun gtags-create-or-update ()
-  "create or update the gnu global tag file"
+  "Create or update the gnu global tag file."
   (interactive)
   (if (not (= 0 (call-process "global" nil nil nil " -p")))     (let ((olddir default-directory)
-          (topdir (read-directory-name  
+          (topdir (read-directory-name
                     "gtags: top of source tree:" default-directory)))
       (cd topdir)
       (shell-command "gtags && echo 'created tagfile'")
@@ -268,3 +265,11 @@ https://github.com/dart-lang/sdk/tree/master/pkg/analyzer_cli#dartanalyzer"
 
 (provide '.emacs)
 ;;; .emacs ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+;;; init.el ends here
