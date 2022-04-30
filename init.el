@@ -41,6 +41,19 @@
         ((eq electric-indent-mode nil) (electric-indent-mode 1))))
 (add-hook 'post-command-hook #'smart-electric-indent-mode)
 
+;; [1]
+;; Skru av eller på linjebryting.
+(global-set-key (kbd "C-x C-l") #'toggle-truncate-lines)
+;; Endre tekststørrelse.
+(global-set-key (kbd "C-=") #'text-scale-increase)
+(global-set-key (kbd "C-+") #'text-scale-increase)
+(global-set-key (kbd "C--") #'text-scale-decrease)
+;; Fornuftig hurtigtast for bevegelse opp/ned et paragraf.
+(global-set-key (kbd "M-n") #'forward-paragraph)
+(global-set-key (kbd "M-p") #'backward-paragraph)
+
+(global-hl-line-mode)
+
 
 ;; [1]
 ;; Select the folder to store packages
@@ -50,8 +63,6 @@
       '(("gnu"   . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
         ("cselpa" . "https://elpa.thecybershadow.net/packages/")
-        ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
-        ;; ("gnu-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
         ))
 ;; [1]
 (unless (bound-and-true-p package--initialized)
@@ -92,17 +103,13 @@
   :config
   (auto-package-update-maybe))
 
-;; [1]
-;; Skru av eller på linjebryting.
-(global-set-key (kbd "C-x C-l") #'toggle-truncate-lines)
-;; Endre tekststørrelse.
-(global-set-key (kbd "C-=") #'text-scale-increase)
-(global-set-key (kbd "C-+") #'text-scale-increase)
-(global-set-key (kbd "C--") #'text-scale-decrease)
-;; Fornuftig hurtigtast for bevegelse opp/ned et paragraf.
-(global-set-key (kbd "M-n") #'forward-paragraph)
-(global-set-key (kbd "M-p") #'backward-paragraph)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  )
 
 (use-package highlight-numbers
   :ensure t
@@ -115,6 +122,53 @@
   :ensure t
   :init
   (add-hook 'prog-mode-hook 'rainbow-mode)
+  )
+
+(use-package eglot
+  ;; LSP-implementasjon of choice
+  :ensure t
+  :init
+
+  (use-package company
+    ;; Hyggelig autocomplete
+    :ensure t
+    :hook eglot-mode
+    )
+
+  (use-package flycheck
+    ;; Hyggelig autocomplete
+    :ensure t
+    :hook eglot-mode
+    )
+
+  (use-package typescript-mode
+    :ensure t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+    (add-to-list 'eglot-server-programs '((typescript-mode) "typescript-language-server --stdio"))
+    (add-hook 'typescript-mode 'eglot-ensure)
+    )
+
+  (use-package go-mode
+    :ensure t
+
+    :init
+    (add-to-list 'eglot-server-programs '((go-mode) "gopls"))
+    (add-hook 'go-mode-hook 'eglot-ensure)
+
+    (add-hook 'go-mode-hook
+              (lambda ()
+                  "Hook for å kjøre gofmt når du lagrer."
+                  (add-hook 'before-save-hook
+                            (lambda ()
+                              (progn (gofmt) nil))
+                            nil
+                            t)))
+    )
+
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure)
   )
 
 (use-package ibuffer
@@ -153,7 +207,7 @@
                    ;; etc
                    ))
                  ))))
-  
+
   ;; Legg til hooken som aktiverer filtrene
   (add-hook 'ibuffer-mode-hook
             (lambda ()
@@ -194,14 +248,13 @@
  '(custom-safe-themes
    '("1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
  '(package-selected-packages
-   '(rainbow-mode highlight-numbers auto-package-update use-package prettier evil eglot typescript-mode xclip gradle-mode dart-server magit go-mode undo-tree ##)))
+   '(exec-path-from-shell rainbow-mode highlight-numbers auto-package-update use-package prettier evil eglot typescript-mode xclip gradle-mode dart-server magit go-mode ##)))
 
 ;; (set-frame-font "PxPlus IBM VGA8 12" nil t)
 (set-frame-font "Meslo LG S 10" nil t)
 
 ;;; Generelle greier
-(global-flycheck-mode)
-(global-hl-line-mode)
+
 ;; (global-highlight-numbers-mode)
 
 (setq backup-directory-alist
@@ -211,20 +264,8 @@
 
 
 ;;; Typescript
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
 
 ;; ;;; Go
-(defun go-fmt-hook ()
-  "Hook for running gofmt on save."
-  (add-hook 'before-save-hook
-    (lambda ()
-    (progn (gofmt) nil))
-    nil
-    t))
-
-
-(add-hook 'go-mode-hook
-          (lambda () (go-fmt-hook)))
 
 
 (flycheck-define-checker dart
