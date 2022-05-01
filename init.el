@@ -117,6 +117,7 @@
   (add-hook 'prog-mode-hook 'highlight-numbers-mode)
   )
 
+
 (use-package rainbow-mode
   ;; For å vise fargen til hex strenger.
   :ensure t
@@ -127,7 +128,11 @@
 (use-package eglot
   ;; LSP-implementasjon of choice
   :ensure t
-  :init
+  :config
+
+  (use-package project
+    :ensure t
+    )
 
   (use-package company
     ;; Hyggelig autocomplete
@@ -143,19 +148,15 @@
 
   (use-package typescript-mode
     :ensure t
-    :init
+    :config
     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-    (add-to-list 'eglot-server-programs '((typescript-mode) "typescript-language-server --stdio"))
+    ;; (add-to-list 'eglot-server-programs '((typescript-mode) "typescript-language-server --stdio"))
     (add-hook 'typescript-mode 'eglot-ensure)
     )
 
   (use-package go-mode
     :ensure t
-
-    :init
-    (add-to-list 'eglot-server-programs '((go-mode) "gopls"))
-    (add-hook 'go-mode-hook 'eglot-ensure)
-
+    :config
     (add-hook 'go-mode-hook
               (lambda ()
                   "Hook for å kjøre gofmt når du lagrer."
@@ -164,7 +165,20 @@
                               (progn (gofmt) nil))
                             nil
                             t)))
+
+    ;; Finn prosjekter, fra https://github.com/golang/tools/blob/master/gopls/doc/emacs.md
+    (defun project-find-go-module (dir)
+      (when-let ((root (locate-dominating-file dir "go.mod")))
+        (cons 'go-module root)))
+    (cl-defmethod project-root ((project (head go-module)))
+      (cdr project))
+    (add-hook 'project-find-functions #'project-find-go-module)
+
+
+    (add-to-list 'eglot-server-programs '((go-mode) "gopls"))
+    (add-hook 'go-mode-hook 'eglot-ensure)
     )
+
 
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (add-hook 'c-mode-hook 'eglot-ensure)
