@@ -1,14 +1,15 @@
+
 ;;; naysayer-theme.el --- The naysayer color theme
 
-;; Author: Nick Aversano <nickav@users.noreply.github.com>
-;; Version: 0.33
+;; Author: Børge Lundsaunet <mail@blund.site>
+;; Version: 1.0
 ;; Filename: naysayer-theme.el
 ;; Package-Requires: ((emacs "24"))
 ;; URL: https://github.com/nickav/naysayer-theme.el
 ;; License: GPL-3+
 
 ;;; Commentary:
-;; Dark green blue color scheme with tan colors.  Inspired by Jonathan Blow's compiler livestreams.
+;; Based on Nick Aversano's recreation of Jonathan Blow's emacs theme
 
 ;;; Code:
 
@@ -40,8 +41,11 @@
       (bot-bar-bg     "#273031") ; For unfocused bottom bar
       (line-fg        "#126367"))
 
+
+
   (custom-theme-set-faces
    'naysayer
+
 
    ;; Default colors
    ;; *****************************************************************************
@@ -91,13 +95,13 @@
                                    :foreground ,background
                                    :background ,text
                                    :box nil))))
- 
+
    `(mode-line-inactive ((t (:inverse-video unspecified
                                             :underline unspecified
                                             :foreground ,text
                                             :background ,bot-bar-bg
                                             :box nil))))
- 
+
    ;; highlight numbers
    `(highlight-numbers-number ((t (:foreground ,numbers))))
   )
