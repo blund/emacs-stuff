@@ -90,7 +90,6 @@
   (require 'bind-key))
 
 
-
 (use-package auto-package-update
   ;; [1]
   ;; Håndter pakke-oppdateringer hver uke, ikke hver dag..
@@ -117,6 +116,13 @@
   (add-hook 'prog-mode-hook 'highlight-numbers-mode)
   )
 
+(use-package magit
+  :ensure t
+  )
+
+(use-package xclip
+  :ensure t
+  )
 
 (use-package rainbow-mode
   ;; For å vise fargen til hex strenger.
@@ -125,37 +131,67 @@
   (add-hook 'prog-mode-hook 'rainbow-mode)
   )
 
+(use-package paren
+  :ensure nil
+  :init
+  (setq show-paren-delay 0) ;; Skru av delay for parentes-merking
+  :config
+  (show-paren-mode +1))
+
 (use-package eglot
   ;; LSP-implementasjon of choice
   :ensure t
   :config
 
   (use-package project
+    ;; Hjelp eglot å finne ut hvor prosjekter er
     :ensure t
+    :after (eglot)
     )
 
   (use-package company
     ;; Hyggelig autocomplete
     :ensure t
-    :hook eglot-mode
-    )
-
-  (use-package flycheck
-    ;; Hyggelig autocomplete
-    :ensure t
-    :hook eglot-mode
+    :after (eglot)
+    :config
+    (add-hook 'prog-mode-hook 'company-mode)
     )
 
   (use-package typescript-mode
     :ensure t
+    :after (eglot project)
     :config
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-    ;; (add-to-list 'eglot-server-programs '((typescript-mode) "typescript-language-server --stdio"))
-    (add-hook 'typescript-mode 'eglot-ensure)
+    (setenv "NODE_PATH" "/usr/bin")
+    ;; https://github.com/joaotavora/eglot/issues/624
+    ;; https://github.com/mohkale/emacs/blob/master/init.org#typescript
+    (define-derived-mode typescript-react-mode typescript-mode
+      "Typescript JSX")
+
+    (put 'typescript-react-mode 'eglot-language-id "typescriptreact")
+    (add-to-list 'eglot-server-programs `(typescript-react-mode . ("typescript-language-server" "--stdio")))
+    (add-hook 'typescript-react-mode-hook 'eglot-ensure)
+    (add-hook 'typescript-react-mode-hook 'company-mode)
+    ;; Finn prosjekt med project
+    (cl-defmethod project-root ((project (head eglot-project)))
+      (cdr project))
+
+    (defun my-project-try-tsconfig-json (dir)
+      (when-let* ((found (locate-dominating-file dir "tsconfig.json")))
+        (cons 'eglot-project found)))
+
+    (add-hook 'project-find-functions
+              'my-project-try-tsconfig-json nil nil)
+
+    ;; Start for tsx også
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-react-mode))
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-react-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-react-mode))
+
     )
 
   (use-package go-mode
     :ensure t
+    :after (eglot)
     :config
     (add-hook 'go-mode-hook
               (lambda ()
@@ -174,15 +210,19 @@
       (cdr project))
     (add-hook 'project-find-functions #'project-find-go-module)
 
-
     (add-to-list 'eglot-server-programs '((go-mode) "gopls"))
     (add-hook 'go-mode-hook 'eglot-ensure)
+    (add-hook 'go-mode-hook 'company-mode)
     )
 
-
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-  (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; Sett opp clangd for c og cpp
+  (use-package cc-mode
+    :ensure nil ;; cc-mode er builtin, så ikke hent med package manager
+    :config
+    (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+    (add-hook 'c-mode-hook 'eglot-ensure)
+    (add-hook 'c++-mode-hook 'eglot-ensure)
+    )
   )
 
 (use-package ibuffer
@@ -241,7 +281,8 @@
 
   )
 
-;; (package-refresh-contents)
+
+;;(package-refresh-contents)
 (setq backup-by-copying t      ; don't clobber symlinks
       backup-directory-alist '(("." . "~/.config/emacs/emacs-saves/"))    ; don't litter my fs tree
       delete-old-versions t
@@ -260,9 +301,9 @@
  '(create-lockfiles nil)
  '(custom-enabled-themes '(naysayer))
  '(custom-safe-themes
-   '("1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
+   '("5d45a95dfd0538c91ee91619bcbb0e8a47e2a299fa3e92ee46bb52d6475438f6" "5001f282dccd7cdf8d58f84d4a5c65853191a5956f646400d774f747f25a2f16" "8da5ccb56b1cc2753bc5578cd0e4e30c27ac542721759357f0086ebff4531a90" "1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
  '(package-selected-packages
-   '(exec-path-from-shell rainbow-mode highlight-numbers auto-package-update use-package prettier evil eglot typescript-mode xclip gradle-mode dart-server magit go-mode ##)))
+   '(macro-expand project xclip use-package typescript-mode rainbow-mode ibuffer-vc highlight-numbers go-mode flycheck exec-path-from-shell eglot company auto-package-update)))
 
 ;; (set-frame-font "PxPlus IBM VGA8 12" nil t)
 (set-frame-font "Meslo LG S 10" nil t)
@@ -307,7 +348,6 @@ https://github.com/dart-lang/sdk/tree/master/pkg/analyzer_cli#dartanalyzer"
 
 (require 'xclip)
 (xclip-mode 1)
-
 
 (defun gtags-create-or-update ()
   "Create or update the gnu global tag file."
