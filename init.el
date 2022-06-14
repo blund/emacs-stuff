@@ -124,6 +124,11 @@
   :ensure t
   )
 
+;; Use rm-improved on deletion
+(setq delete-by-moving-to-trash t)
+(defun system-move-file-to-trash (filename)
+  (shell-command (concat (executable-find "rip") " " filename)))
+
 (use-package rainbow-mode
   ;; For å vise fargen til hex strenger.
   :ensure t
@@ -292,6 +297,10 @@
 (setq auto-save-file-name-transforms
       `((".*" "~/.config/emacs/emacs-saves/" t)))
 
+(add-to-list 'load-path "~/.config/emacs/custom-stuff/")
+(require 'elf-mode)
+(elf-setup-default)
+
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -301,7 +310,7 @@
  '(create-lockfiles nil)
  '(custom-enabled-themes '(naysayer))
  '(custom-safe-themes
-   '("5d45a95dfd0538c91ee91619bcbb0e8a47e2a299fa3e92ee46bb52d6475438f6" "5001f282dccd7cdf8d58f84d4a5c65853191a5956f646400d774f747f25a2f16" "8da5ccb56b1cc2753bc5578cd0e4e30c27ac542721759357f0086ebff4531a90" "1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
+   '("fe6d5c7f964e132b585772e43e6d6cf67aa02f4c0c86c222ecfd6269e24ccfc5" "5d45a95dfd0538c91ee91619bcbb0e8a47e2a299fa3e92ee46bb52d6475438f6" "5001f282dccd7cdf8d58f84d4a5c65853191a5956f646400d774f747f25a2f16" "8da5ccb56b1cc2753bc5578cd0e4e30c27ac542721759357f0086ebff4531a90" "1c001faab3c285cbf8ed0ea37ac4e0114b51ca39012510558265c31d9b9b5eab" "509af944490046bcffab808c4a39f1f093a358fbefb4748f00f7beb4b26bee38" "a317d947943e5925de40217b01f8762271945464fb216a9f2231be0ce7e2beaa" "ad503ecce2f5f758ebd883f951e33a428672beaa04c1ef327497f2cf1cd005b3" "51d400b018190c6dd7d2ada3109e2ac2194eddc02832c8fc0e7f402031c4ab29" default))
  '(package-selected-packages
    '(macro-expand project xclip use-package typescript-mode rainbow-mode ibuffer-vc highlight-numbers go-mode flycheck exec-path-from-shell eglot company auto-package-update)))
 
