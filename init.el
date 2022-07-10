@@ -22,7 +22,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-	'(auto-package-update magit project company eglot use-package evil)))
+	'(vlf auto-package-update magit project company eglot use-package evil)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -30,32 +30,33 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; Custom theme mappe
+(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
+
 (unless (package-installed-p 'use-package)
- (package-refresh-contents)
- (package-install 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package)
  )
 
 ;; Bare oppdater pakker en gang i uken :)
  (use-package auto-package-update
-	  :ensure t
-   	:if (not (daemonp))
-  	:custom
-	  (auto-package-update-interval 7) ;; in days
-    (auto-package-update-prompt-before-update t)
-	  (auto-package-update-delete-old-versions t)
-	  (auto-package-update-hide-results t)
-		:config
-	  (auto-package-update-maybe)
-		)
+	 :ensure t
+   :if (not (daemonp))
+   :custom
+	 (auto-package-update-interval 7) ;; in days
+   (auto-package-update-prompt-before-update t)
+	 (auto-package-update-delete-old-versions t)
+	 (auto-package-update-hide-results t)
+	 :config
+	 (auto-package-update-maybe)
+  )
 
 
 (use-package evil
   :ensure t
   :config
-	  (add-hook 'prog-mode-hook 'company-mode)
+	(add-hook 'prog-mode-hook 'evil-mode)
   )
-
-
 
 (use-package magit
   :ensure t
@@ -98,3 +99,7 @@
   (setq show-paren-delay 0) ;; Skru av delay for parentes-merking
   :config
   (show-paren-mode +1))
+
+(use-package vlf
+	:ensure t
+	)
