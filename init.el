@@ -1,5 +1,5 @@
 
-;; Package-greier
+; Package-greier
 (setq package-enable-at-startup nil)
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-archives
@@ -7,7 +7,12 @@
         ("melpa" . "https://melpa.org/packages/")
         ("cselpa" . "https://elpa.thecybershadow.net/packages/")
         ))
-(setq indent-tabs-mode t)
+
+
+;; Custom theme mappe
+(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
+
+
 (setq tab-stop-list (number-sequence 2 200 2))
 (setq tab-width 2)
 (setq indent-line-function 'insert-tab)
@@ -16,15 +21,18 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(naysayer))
  '(custom-safe-themes
-	'("fe6d5c7f964e132b585772e43e6d6cf67aa02f4c0c86c222ecfd6269e24ccfc5" default))
+   '("fe6d5c7f964e132b585772e43e6d6cf67aa02f4c0c86c222ecfd6269e24ccfc5" default))
  '(package-selected-packages
-	'(vlf auto-package-update magit project company eglot use-package evil)))
+   '(vlf auto-package-update magit project company eglot use-package evil)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -32,8 +40,6 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; Custom theme mappe
-(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
