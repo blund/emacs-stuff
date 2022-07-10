@@ -21,6 +21,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+	'("fe6d5c7f964e132b585772e43e6d6cf67aa02f4c0c86c222ecfd6269e24ccfc5" default))
  '(package-selected-packages
 	'(vlf auto-package-update magit project company eglot use-package evil)))
 (custom-set-faces
