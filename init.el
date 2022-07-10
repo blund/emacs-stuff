@@ -1,4 +1,8 @@
 
+;; Inpsirasjon:
+; https://cute-jumper.github.io/emacs/2016/02/22/my-simple-setup-to-avoid-rsi-in-emacs
+
+
 ; Package-greier
 (setq package-enable-at-startup nil)
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
